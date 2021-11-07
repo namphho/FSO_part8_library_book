@@ -1,4 +1,6 @@
 const { ApolloServer, gql } = require('apollo-server')
+const { groupBy } = require('lodash')
+const _ = require('lodash')
 
 let authors = [
   {
@@ -96,10 +98,15 @@ const typeDefs = gql`
     id: String!
     genres: [String!]!
   }
+  type AllAuthors {
+    name: String!
+    bookCount: Int!
+  }
   type Query {
     bookCount: Int!
     authorCount: Int!
     allBooks: [Book!]!
+    allAuthors: [AllAuthors!]!
   }
 `
 
@@ -108,6 +115,16 @@ const resolvers = {
     bookCount: () => books.length,
     authorCount: () => authors.length,
     allBooks: () => books,
+    allAuthors: () => {
+      const groupOfAuthor = groupBy(books, (book) => book.author)
+      const result = Object.entries(groupOfAuthor).map((v) => {
+        return {
+          name: v[0],
+          bookCount: v[1].length,
+        }
+      })
+      return result
+    },
   },
 }
 
