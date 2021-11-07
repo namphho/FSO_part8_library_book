@@ -115,7 +115,17 @@ const resolvers = {
     bookCount: () => books.length,
     authorCount: () => authors.length,
     allBooks: (root, args) => {
-      return books.filter((b) => b.genres.includes(args.genre))
+      if (!args.author && !args.genre) {
+        return books
+      }
+      var result = books
+      if (args.author) {
+        result = result.filter((b) => b.author === args.author)
+      }
+      if (args.genre) {
+        result = result.filter((b) => b.genres.includes(args.genre))
+      }
+      return result
     },
     allAuthors: () => {
       const groupOfAuthor = groupBy(books, (book) => book.author)
